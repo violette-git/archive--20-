@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dig Deep: Incremental Mining Adventure</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="save_system.css">
+    <link rel="stylesheet" href="tutorial.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Russo+One&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="game-container">
+        <!-- Header with game title and basic stats -->
+        <header class="game-header">
+            <h1>Dig Deep</h1>
+            <div class="resource-display">
+                <div class="resource" id="dirt-counter">
+                    <span class="resource-icon"></span>
+                    <span class="resource-value">0</span> Dirt
+                </div>
+                <div class="resource" id="stone-counter">
+                    <span class="resource-icon"></span>
+                    <span class="resource-value">0</span> Stone
+                </div>
+                <div class="resource" id="gems-counter">
+                    <span class="resource-icon"></span>
+                    <span class="resource-value">0</span> Gems
+                </div>
+            </div>
+            <!-- Save/Load buttons will be added here by save_system.js -->
+        </header>
+
+        <main class="game-main">
+            <!-- Digging area - main interaction zone -->
+            <section class="digging-area">
+                <div class="digging-background" id="digging-background">
+                    <div class="depth-indicator">
+                        <span class="depth-label">Depth:</span>
+                        <span class="depth-value" id="depth-value">0</span>m
+                    </div>
+                    <!-- Hazards will appear here dynamically -->
+                </div>
+                <button id="dig-button" class="dig-button">DIG!</button>
+            </section>
+
+            <!-- Game panels container -->
+            <div class="game-panels">
+                <!-- Upgrades panel -->
+                <section class="panel upgrades-panel">
+                    <h2>Upgrades</h2>
+                    <div class="panel-content" id="upgrades-container">
+                        <!-- Upgrades will be dynamically inserted here -->
+                    </div>
+                </section>
+
+                <!-- Stats panel -->
+                <section class="panel stats-panel">
+                    <h2>Stats</h2>
+                    <div class="panel-content" id="stats-container">
+                        <div class="stat-item">
+                            <span class="stat-label">Clicks:</span>
+                            <span class="stat-value" id="clicks-stat">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Digs per second:</span>
+                            <span class="stat-value" id="dps-stat">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Play time:</span>
+                            <span class="stat-value" id="playtime-stat">00:00:00</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Achievements panel -->
+                <section class="panel achievements-panel">
+                    <h2>Achievements</h2>
+                    <div class="panel-content" id="achievements-container">
+                        <!-- Achievements will be dynamically inserted here -->
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <footer class="game-footer">
+            <p>Dig Deep: Incremental Mining Adventure &copy; 2025</p>
+        </footer>
+    </div>
+
+    <!-- Tutorial overlay -->
+    <div id="tutorial-overlay" class="tutorial-overlay">
+        <div class="tutorial-container">
+            <div class="tutorial-header">
+                <h2>Welcome to Dig Deep!</h2>
+                <button id="tutorial-close" class="tutorial-close-button">&times;</button>
+            </div>
+            <div class="tutorial-content">
+                <div class="tutorial-step" data-step="1">
+                    <h3>Getting Started</h3>
+                    <p>Dig Deep is an incremental clicker game where you dig deeper and deeper into the earth, collecting resources and discovering secrets along the way.</p>
+                    <p>Click the <strong>DIG!</strong> button to start digging and collecting resources.</p>
+                    <img src="tutorial_dig.png" alt="Dig Button" class="tutorial-image">
+                </div>
+                
+                <div class="tutorial-step" data-step="2" style="display: none;">
+                    <h3>Resources</h3>
+                    <p>As you dig, you'll collect different resources:</p>
+                    <ul>
+                        <li><strong>Dirt</strong> - The most common resource, found near the surface</li>
+                        <li><strong>Stone</strong> - Found deeper underground, more valuable than dirt</li>
+                        <li><strong>Gems</strong> - Rare and valuable, found in the deepest layers</li>
+                    </ul>
+                    <p>Use these resources to purchase upgrades that will help you dig faster and deeper!</p>
+                </div>
+                
+                <div class="tutorial-step" data-step="3" style="display: none;">
+                    <h3>Upgrades</h3>
+                    <p>Spend your resources on upgrades to improve your digging efficiency:</p>
+                    <ul>
+                        <li><strong>Tools</strong> - Improve your manual digging power</li>
+                        <li><strong>Automation</strong> - Dig automatically without clicking</li>
+                        <li><strong>Special</strong> - Unique upgrades with powerful effects</li>
+                    </ul>
+                    <p>New upgrades will become available as you reach deeper depths!</p>
+                </div>
+                
+                <div class="tutorial-step" data-step="4" style="display: none;">
+                    <h3>Hazards</h3>
+                    <p>As you dig deeper, you'll encounter hazards that can slow your progress:</p>
+                    <ul>
+                        <li>Cave-ins, gas leaks, and other dangers will appear</li>
+                        <li>You'll get a warning before hazards activate</li>
+                        <li>Spend resources to prevent hazards before they cause damage</li>
+                    </ul>
+                    <p>Be prepared and keep an eye out for warning signs!</p>
+                </div>
+                
+                <div class="tutorial-step" data-step="5" style="display: none;">
+                    <h3>Discoveries</h3>
+                    <p>The deeper you dig, the more secrets you'll uncover:</p>
+                    <ul>
+                        <li>Special discoveries at certain depths</li>
+                        <li>Random events that can help or hinder your progress</li>
+                        <li>Achievements to unlock for special bonuses</li>
+                    </ul>
+                    <p>How deep can you go? What mysteries await in the depths?</p>
+                </div>
+                
+                <div class="tutorial-step" data-step="6" style="display: none;">
+                    <h3>Saving Your Progress</h3>
+                    <p>Your game is automatically saved every minute, but you can also:</p>
+                    <ul>
+                        <li>Save manually using the Save button</li>
+                        <li>Export your save file to back it up</li>
+                        <li>Import a save file to restore your progress</li>
+                    </ul>
+                    <p>Now you're ready to start digging! Good luck!</p>
+                </div>
+                
+                <div class="tutorial-navigation">
+                    <button id="tutorial-prev" class="tutorial-nav-button" disabled>Previous</button>
+                    <div class="tutorial-dots">
+                        <span class="tutorial-dot active" data-step="1"></span>
+                        <span class="tutorial-dot" data-step="2"></span>
+                        <span class="tutorial-dot" data-step="3"></span>
+                        <span class="tutorial-dot" data-step="4"></span>
+                        <span class="tutorial-dot" data-step="5"></span>
+                        <span class="tutorial-dot" data-step="6"></span>
+                    </div>
+                    <button id="tutorial-next" class="tutorial-nav-button">Next</button>
+                </div>
+            </div>
+            <div class="tutorial-footer">
+                <button id="tutorial-start" class="tutorial-button">Start Digging!</button>
+                <label class="tutorial-checkbox-label">
+                    <input type="checkbox" id="tutorial-dont-show">
+                    Don't show this again
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auto-save indicator -->
+    <div class="auto-save-indicator" id="auto-save-indicator">Game saved</div>
+
+    <!-- Game scripts -->
+    <script src="config.js"></script>
+    <script src="data.js"></script>
+    <script src="assets.js"></script>
+    <script src="content.js"></script>
+    <script src="achievements.js"></script>
+    <script src="engine.js"></script>
+    <script src="save_system.js"></script>
+    <script src="admin.js"></script>
+    <script src="game.js"></script>
+    <script src="tutorial.js"></script>
+</body>
+</html>
