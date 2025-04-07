@@ -3,199 +3,186 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dig Deep: Incremental Mining Adventure</title>
+    <title>DigDeep - Mining Game</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="save_system.css">
     <link rel="stylesheet" href="tutorial.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Russo+One&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="audio_controls.css">
 </head>
 <body>
+    <div class="header">
+        <h1 class="game-title">DigDeep</h1>
+        <div class="header-section header-consumables">
+            <h3>Consumables</h3>
+            <div class="consumable-slots" id="consumable-slots">
+                </div>
+        </div>
+    
+        <div class="header-section header-upgrades">
+            <h3>Upgrades</h3>
+            <div class="upgrade-levels" id="upgrade-levels-header">
+                </div>
+        </div>
+        <div class="resource-counters">
+            <div class="resource-counter resource-dirt tooltip">
+                <div class="resource-icon" id="dirt-icon"></div>
+                <span class="resource-value" id="dirt-counter">0</span>
+                <span class="tooltip-text">Dirt</span>
+            </div>
+            <div class="resource-counter resource-stone tooltip">
+                <div class="resource-icon" id="stone-icon"></div>
+                <span class="resource-value" id="stone-counter">0</span>
+                <span class="tooltip-text">Stone</span>
+            </div>
+            <div class="resource-counter resource-copper tooltip">
+                <div class="resource-icon" id="copper-icon"></div>
+                <span class="resource-value" id="copper-counter">0</span>
+                <span class="tooltip-text">Copper</span>
+            </div>
+            <div class="resource-counter resource-iron tooltip">
+                <div class="resource-icon" id="iron-icon"></div>
+                <span class="resource-value" id="iron-counter">0</span>
+                <span class="tooltip-text">Iron</span>
+            </div>
+            <div class="resource-counter resource-gold tooltip">
+                <div class="resource-icon" id="gold-icon"></div>
+                <span class="resource-value" id="gold-counter">0</span>
+                <span class="tooltip-text">Gold</span>
+            </div>
+            <div class="resource-counter resource-diamond tooltip">
+                <div class="resource-icon" id="diamond-icon"></div>
+                <span class="resource-value" id="diamond-counter">0</span>
+                <span class="tooltip-text">Diamond</span>
+            </div>
+            <div class="resource-counter resource-emerald tooltip">
+                <div class="resource-icon" id="emerald-icon"></div>
+                <span class="resource-value" id="emerald-counter">0</span>
+                <span class="tooltip-text">Emerald</span>
+            </div>
+            <div class="resource-counter resource-ruby tooltip">
+                <div class="resource-icon" id="ruby-icon"></div>
+                <span class="resource-value" id="ruby-counter">0</span>
+                <span class="tooltip-text">Ruby</span>
+            </div>
+            <div class="resource-counter resource-sapphire tooltip">
+                <div class="resource-icon" id="sapphire-icon"></div>
+                <span class="resource-value" id="sapphire-counter">0</span>
+                <span class="tooltip-text">Sapphire</span>
+            </div>
+        </div>
+    </div>
+    
     <div class="game-container">
-        <!-- Header with game title and basic stats -->
-        <header class="game-header">
-            <h1>Dig Deep</h1>
-            <div class="resource-display">
-                <div class="resource" id="dirt-counter">
-                    <span class="resource-icon"></span>
-                    <span class="resource-value">0</span> Dirt
-                </div>
-                <div class="resource" id="stone-counter">
-                    <span class="resource-icon"></span>
-                    <span class="resource-value">0</span> Stone
-                </div>
-                <div class="resource" id="gems-counter">
-                    <span class="resource-icon"></span>
-                    <span class="resource-value">0</span> Gems
+        <div class="left-panel">
+            <div class="tabs">
+                <button class="tab-button active" data-tab="upgrades">Upgrades</button>
+                <button class="tab-button" data-tab="consumables">Consumables</button>
+                <button class="tab-button" data-tab="special">Special</button>
+                <button class="tab-button" data-tab="stats">Stats</button>
+                <button class="tab-button" data-tab="achievements">Achievements</button>
+            </div>
+            
+            <div class="tab-content active" id="upgrades-tab">
+                <div class="card-container" id="upgrades-container">
+                    <!-- Cards will be dynamically generated here -->
                 </div>
             </div>
-            <!-- Save/Load buttons will be added here by save_system.js -->
-        </header>
-
-        <main class="game-main">
-            <!-- Digging area - main interaction zone -->
-            <section class="digging-area">
-                <div class="digging-background" id="digging-background">
-                    <div class="depth-indicator">
-                        <span class="depth-label">Depth:</span>
-                        <span class="depth-value" id="depth-value">0</span>m
+            
+            <div class="tab-content" id="consumables-tab">
+                <div id="equipped-items-container">
+                    <h3>Equipped Items</h3>
                     </div>
-                    <!-- Hazards will appear here dynamically -->
-                </div>
-                <button id="dig-button" class="dig-button">DIG!</button>
-            </section>
-
-            <!-- Game panels container -->
-            <div class="game-panels">
-                <!-- Upgrades panel -->
-                <section class="panel upgrades-panel">
-                    <h2>Upgrades</h2>
-                    <div class="panel-content" id="upgrades-container">
-                        <!-- Upgrades will be dynamically inserted here -->
+                <div class="card-container" id="consumables-container">
                     </div>
-                </section>
-
-                <!-- Stats panel -->
-                <section class="panel stats-panel">
-                    <h2>Stats</h2>
-                    <div class="panel-content" id="stats-container">
-                        <div class="stat-item">
-                            <span class="stat-label">Clicks:</span>
-                            <span class="stat-value" id="clicks-stat">0</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Digs per second:</span>
-                            <span class="stat-value" id="dps-stat">0</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Play time:</span>
-                            <span class="stat-value" id="playtime-stat">00:00:00</span>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Achievements panel -->
-                <section class="panel achievements-panel">
-                    <h2>Achievements</h2>
-                    <div class="panel-content" id="achievements-container">
-                        <!-- Achievements will be dynamically inserted here -->
-                    </div>
-                </section>
             </div>
-        </main>
+            
+            <div class="tab-content" id="special-tab">
+                <div class="card-container" id="special-container">
+                    <!-- Cards will be dynamically generated here -->
+                </div>
+            </div>
+            
+            <div class="tab-content" id="stats-tab">
+                <div id="stats-content">
+                    <!-- Stats will be dynamically generated here -->
+                </div>
+            </div>
+            
+            <div class="tab-content" id="achievements-tab">
+                <div id="achievements-content">
+                    <!-- Achievements will be dynamically generated here -->
+                </div>
+            </div>
+        </div>
 
-        <footer class="game-footer">
-            <p>Dig Deep: Incremental Mining Adventure &copy; 2025</p>
-        </footer>
+        <div class="right-panel">
+            <div class="digging-area" id="digging-area">
+                <!-- Digging area content -->
+                <div id="layer-indicator"></div>
+            </div>
+            <button class="button dig-button" id="dig-button">DIG</button>
+        </div>
     </div>
 
-    <!-- Tutorial overlay -->
+    <!-- Stats Panel (Hidden by default) -->
+    <div class="panel" id="stats-panel" style="display: none;">
+        <h2>Stats</h2>
+        <div id="stats-content"></div>
+    </div>
+
+    <!-- Achievements Panel (Hidden by default) -->
+    <div class="panel" id="achievements-panel" style="display: none;">
+        <h2>Achievements</h2>
+        <div id="achievements-content"></div>
+    </div>
+
+    <!-- Tutorial Overlay -->
     <div id="tutorial-overlay" class="tutorial-overlay">
-        <div class="tutorial-container">
-            <div class="tutorial-header">
-                <h2>Welcome to Dig Deep!</h2>
-                <button id="tutorial-close" class="tutorial-close-button">&times;</button>
+        <div class="tutorial-content">
+            <div class="tutorial-step active" data-step="1">
+                <h2>Welcome to DigDeep!</h2>
+                <p>Click or tap anywhere in the digging area to dig and collect resources.</p>
+                <button class="tutorial-next-button button">Next</button>
             </div>
-            <div class="tutorial-content">
-                <div class="tutorial-step" data-step="1">
-                    <h3>Getting Started</h3>
-                    <p>Dig Deep is an incremental clicker game where you dig deeper and deeper into the earth, collecting resources and discovering secrets along the way.</p>
-                    <p>Click the <strong>DIG!</strong> button to start digging and collecting resources.</p>
-                    <img src="tutorial_dig.png" alt="Dig Button" class="tutorial-image">
-                </div>
-                
-                <div class="tutorial-step" data-step="2" style="display: none;">
-                    <h3>Resources</h3>
-                    <p>As you dig, you'll collect different resources:</p>
-                    <ul>
-                        <li><strong>Dirt</strong> - The most common resource, found near the surface</li>
-                        <li><strong>Stone</strong> - Found deeper underground, more valuable than dirt</li>
-                        <li><strong>Gems</strong> - Rare and valuable, found in the deepest layers</li>
-                    </ul>
-                    <p>Use these resources to purchase upgrades that will help you dig faster and deeper!</p>
-                </div>
-                
-                <div class="tutorial-step" data-step="3" style="display: none;">
-                    <h3>Upgrades</h3>
-                    <p>Spend your resources on upgrades to improve your digging efficiency:</p>
-                    <ul>
-                        <li><strong>Tools</strong> - Improve your manual digging power</li>
-                        <li><strong>Automation</strong> - Dig automatically without clicking</li>
-                        <li><strong>Special</strong> - Unique upgrades with powerful effects</li>
-                    </ul>
-                    <p>New upgrades will become available as you reach deeper depths!</p>
-                </div>
-                
-                <div class="tutorial-step" data-step="4" style="display: none;">
-                    <h3>Hazards</h3>
-                    <p>As you dig deeper, you'll encounter hazards that can slow your progress:</p>
-                    <ul>
-                        <li>Cave-ins, gas leaks, and other dangers will appear</li>
-                        <li>You'll get a warning before hazards activate</li>
-                        <li>Spend resources to prevent hazards before they cause damage</li>
-                    </ul>
-                    <p>Be prepared and keep an eye out for warning signs!</p>
-                </div>
-                
-                <div class="tutorial-step" data-step="5" style="display: none;">
-                    <h3>Discoveries</h3>
-                    <p>The deeper you dig, the more secrets you'll uncover:</p>
-                    <ul>
-                        <li>Special discoveries at certain depths</li>
-                        <li>Random events that can help or hinder your progress</li>
-                        <li>Achievements to unlock for special bonuses</li>
-                    </ul>
-                    <p>How deep can you go? What mysteries await in the depths?</p>
-                </div>
-                
-                <div class="tutorial-step" data-step="6" style="display: none;">
-                    <h3>Saving Your Progress</h3>
-                    <p>Your game is automatically saved every minute, but you can also:</p>
-                    <ul>
-                        <li>Save manually using the Save button</li>
-                        <li>Export your save file to back it up</li>
-                        <li>Import a save file to restore your progress</li>
-                    </ul>
-                    <p>Now you're ready to start digging! Good luck!</p>
-                </div>
-                
-                <div class="tutorial-navigation">
-                    <button id="tutorial-prev" class="tutorial-nav-button" disabled>Previous</button>
-                    <div class="tutorial-dots">
-                        <span class="tutorial-dot active" data-step="1"></span>
-                        <span class="tutorial-dot" data-step="2"></span>
-                        <span class="tutorial-dot" data-step="3"></span>
-                        <span class="tutorial-dot" data-step="4"></span>
-                        <span class="tutorial-dot" data-step="5"></span>
-                        <span class="tutorial-dot" data-step="6"></span>
-                    </div>
-                    <button id="tutorial-next" class="tutorial-nav-button">Next</button>
-                </div>
+    
+            <div class="tutorial-step" data-step="2" style="display: none;">
+                <h2>Resource Display</h2>
+                <p>Your collected resources will be shown at the top of the screen.</p>
+                <button class="tutorial-next-button button">Next</button>
             </div>
-            <div class="tutorial-footer">
-                <button id="tutorial-start" class="tutorial-button">Start Digging!</button>
-                <label class="tutorial-checkbox-label">
-                    <input type="checkbox" id="tutorial-dont-show">
-                    Don't show this again
-                </label>
+    
+            <div class="tutorial-step" data-step="3" style="display: none;">
+                <h2>Upgrades</h2>
+                <p>Use the 'Upgrades' tab on the left to improve your digging abilities.</p>
+                <button class="tutorial-next-button button">Next</button>
+            </div>
+    
+            <div class="tutorial-step" data-step="4" style="display: none;">
+                <h2>Consumables & Special Items</h2>
+                <p>Explore the 'Consumables' and 'Special' tabs for helpful items.</p>
+                <button class="tutorial-next-button button">Next</button>
+            </div>
+    
+            <div class="tutorial-step" data-step="5" style="display: none;">
+                <h2>That's the basics!</h2>
+                <p>Now get digging and see what treasures you can find!</p>
+                <button class="tutorial-close-button button">Close Tutorial</button>
             </div>
         </div>
     </div>
 
-    <!-- Auto-save indicator -->
-    <div class="auto-save-indicator" id="auto-save-indicator">Game saved</div>
+    <!-- Notification System -->
+    <div id="notification-container" class="notification-container"></div>
 
-    <!-- Game scripts -->
+    <!-- Scripts -->
     <script src="config.js"></script>
-    <script src="data.js"></script>
     <script src="assets.js"></script>
-    <script src="content.js"></script>
-    <script src="achievements.js"></script>
+    <script src="data.js"></script>
+    <script src="audio.js"></script>
     <script src="engine.js"></script>
+    <script src="achievements.js"></script>
     <script src="save_system.js"></script>
-    <script src="admin.js"></script>
-    <script src="game.js"></script>
     <script src="tutorial.js"></script>
+    <script src="audio_controls.js"></script>
+    <script src="game.js"></script>
 </body>
 </html>

@@ -1,0 +1,5 @@
+Audio Attribution Information
+===========================
+
+All audio files were procedurally generated using Python.
+No external audio sources were used.

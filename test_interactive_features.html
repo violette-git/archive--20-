@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DigDeep - Interactive Features Test</title>
+    <link rel="stylesheet" href="digdeep/style.css">
+    <link rel="stylesheet" href="digdeep/tutorial.css">
+    <style>
+        .test-controls {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px;
+            display: flex;
+            justify-content: space-around;
+            z-index: 1000;
+        }
+        
+        .test-button {
+            background-color: #0f3460;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .test-button:hover {
+            background-color: #e94560;
+        }
+        
+        .test-log {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            width: 300px;
+            height: 200px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: #0f0;
+            font-family: monospace;
+            padding: 10px;
+            overflow-y: auto;
+            z-index: 1000;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 class="game-title">DigDeep - Test</h1>
+        <div class="resource-counters">
+            <div class="resource-counter resource-dirt tooltip">
+                <div class="resource-icon" id="dirt-icon"></div>
+                <span class="resource-value" id="dirt-counter">0</span>
+                <span class="tooltip-text">Dirt</span>
+            </div>
+            <div class="resource-counter resource-stone tooltip">
+                <div class="resource-icon" id="stone-icon"></div>
+                <span class="resource-value" id="stone-counter">0</span>
+                <span class="tooltip-text">Stone</span>
+            </div>
+            <div class="resource-counter resource-copper tooltip">
+                <div class="resource-icon" id="copper-icon"></div>
+                <span class="resource-value" id="copper-counter">0</span>
+                <span class="tooltip-text">Copper</span>
+            </div>
+            <div class="resource-counter resource-iron tooltip">
+                <div class="resource-icon" id="iron-icon"></div>
+                <span class="resource-value" id="iron-counter">0</span>
+                <span class="tooltip-text">Iron</span>
+            </div>
+            <div class="resource-counter resource-gold tooltip">
+                <div class="resource-icon" id="gold-icon"></div>
+                <span class="resource-value" id="gold-counter">0</span>
+                <span class="tooltip-text">Gold</span>
+            </div>
+            <div class="resource-counter resource-diamond tooltip">
+                <div class="resource-icon" id="diamond-icon"></div>
+                <span class="resource-value" id="diamond-counter">0</span>
+                <span class="tooltip-text">Diamond</span>
+            </div>
+            <div class="resource-counter resource-emerald tooltip">
+                <div class="resource-icon" id="emerald-icon"></div>
+                <span class="resource-value" id="emerald-counter">0</span>
+                <span class="tooltip-text">Emerald</span>
+            </div>
+            <div class="resource-counter resource-ruby tooltip">
+                <div class="resource-icon" id="ruby-icon"></div>
+                <span class="resource-value" id="ruby-counter">0</span>
+                <span class="tooltip-text">Ruby</span>
+            </div>
+            <div class="resource-counter resource-sapphire tooltip">
+                <div class="resource-icon" id="sapphire-icon"></div>
+                <span class="resource-value" id="sapphire-counter">0</span>
+                <span class="tooltip-text">Sapphire</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="game-container">
+        <div class="left-panel">
+            <!-- Trading Card UI -->
+            <div class="card-tabs">
+                <div class="card-tab active" data-category="upgrades">Upgrades</div>
+                <div class="card-tab" data-category="consumables">Consumables</div>
+                <div class="card-tab" data-category="special">Special</div>
+            </div>
+            
+            <!-- Upgrades Cards -->
+            <div class="card-category active" id="upgrades-container">
+                <!-- Cards will be dynamically generated here -->
+            </div>
+            
+            <!-- Consumables Cards -->
+            <div class="card-category" id="consumables-container">
+                <!-- Cards will be dynamically generated here -->
+            </div>
+            
+            <!-- Special Cards -->
+            <div class="card-category" id="special-container">
+                <!-- Cards will be dynamically generated here -->
+            </div>
+        </div>
+
+        <div class="right-panel">
+            <div class="digging-area" id="digging-area">
+                <!-- Digging area content -->
+                <div id="layer-indicator"></div>
+            </div>
+            <button class="button dig-button" id="dig-button">DIG</button>
+        </div>
+    </div>
+
+    <!-- Test Controls -->
+    <div class="test-controls">
+        <button class="test-button" id="test-resource-interaction">Test Resource Interaction</button>
+        <button class="test-button" id="test-card-interaction">Test Card Interaction</button>
+        <button class="test-button" id="test-dig-interaction">Test Dig Interaction</button>
+        <button class="test-button" id="test-animations">Test Animations</button>
+        <button class="test-button" id="add-resources">Add Resources</button>
+    </div>
+
+    <!-- Test Log -->
+    <div class="test-log" id="test-log"></div>
+
+    <!-- Scripts -->
+    <script src="digdeep/config.js"></script>
+    <script src="digdeep/assets.js"></script>
+    <script src="digdeep/data.js"></script>
+    <script src="digdeep/engine.js"></script>
+    <script src="digdeep/game.js"></script>
+    <script src="test_interactive_features.js"></script>
+    
+    <script>
+        // Test utility functions
+        const TestUtils = {
+            log: function(message) {
+                const logElement = document.getElementById('test-log');
+                logElement.innerHTML += `<div>${message}</div>`;
+                logElement.scrollTop = logElement.scrollHeight;
+                console.log(message);
+            },
+            
+            clearLog: function() {
+                document.getElementById('test-log').innerHTML = '';
+            },
+            
+            simulateClick: function(element) {
+                const event = new MouseEvent('click', {
+                    bubbles: true,
+                    cancelable: true,
+                    view: window
+                });
+                element.dispatchEvent(event);
+            },
+            
+            simulateHover: function(element) {
+                const enterEvent = new MouseEvent('mouseenter', {
+                    bubbles: true,
+                    cancelable: true,
+                    view: window
+                });
+                element.dispatchEvent(enterEvent);
+            },
+            
+            addResources: function() {
+                // Add resources for testing
+                GameState.resources.dirt += 1000;
+                GameState.resources.stone += 500;
+                GameState.resources.copper += 200;
+                GameState.resources.iron += 100;
+                GameState.resources.gold += 50;
+                GameState.resources.diamond += 20;
+                GameState.resources.emerald += 10;
+                GameState.resources.ruby += 10;
+                GameState.resources.sapphire += 10;
+                
+                // Update UI
+                GameEngine.updateUI();
+                
+                this.log("Added test resources");
+            }
+        };
+        
+        // Set up test button event listeners
+        document.getElementById('test-resource-interaction').addEventListener('click', function() {
+            TestUtils.clearLog();
+            TestUtils.log("Testing resource interaction...");
+            
+            // Test clicking on each resource counter
+            const resourceCounters = document.querySelectorAll('.resource-counter');
+            resourceCounters.forEach(counter => {
+                const resourceType = counter.classList[1].split('-')[1];
+                TestUtils.log(`Clicking on ${resourceType} counter`);
+                TestUtils.simulateClick(counter);
+            });
+        });
+        
+        document.getElementById('test-card-interaction').addEventListener('click', function() {
+            TestUtils.clearLog();
+            TestUtils.log("Testing card interaction...");
+            
+            // Test clicking on each card tab
+            const cardTabs = document.querySelectorAll('.card-tab');
+            cardTabs.forEach(tab => {
+                const category = tab.dataset.category;
+                TestUtils.log(`Clicking on ${category} tab`);
+                TestUtils.simulateClick(tab);
+                
+                // Test clicking on a card in this category if available
+                const cards = document.querySelectorAll(`#${category}-container .card`);
+                if (cards.length > 0) {
+                    TestUtils.log(`Clicking on a ${category} card`);
+                    TestUtils.simulateClick(cards[0]);
+                }
+            });
+        });
+        
+        document.getElementById('test-dig-interaction').addEventListener('click', function() {
+            TestUtils.clearLog();
+            TestUtils.log("Testing dig interaction...");
+            
+            // Test clicking on dig button
+            TestUtils.log("Clicking dig button");
+            TestUtils.simulateClick(document.getElementById('dig-button'));
+            
+            // Test clicking on digging area
+            const diggingArea = document.getElementById('digging-area');
+            TestUtils.log("Clicking on digging area");
+            
+            // Simulate clicks at different positions
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    const x = Math.random() * diggingArea.offsetWidth;
+                    const y = Math.random() * diggingArea.offsetHeight;
+                    
+                    const event = new MouseEvent('click', {
+                        bubbles: true,
+                        cancelable: true,
+                        clientX: diggingArea.getBoundingClientRect().left + x,
+                        clientY: diggingArea.getBoundingClientRect().top + y,
+                        view: window
+                    });
+                    
+                    diggingArea.dispatchEvent(event);
+                    TestUtils.log(`Clicked at position (${Math.round(x)}, ${Math.round(y)})`);
+                }, i * 500);
+            }
+        });
+        
+        document.getElementById('test-animations').addEventListener('click', function() {
+            TestUtils.clearLog();
+            TestUtils.log("Testing animations...");
+            
+            // Test resource gain animation
+            TestUtils.log("Testing resource gain animation");
+            Assets.createResourceGainAnimation('dirt', 10, 100, 100);
+            
+            setTimeout(() => {
+                Assets.createResourceGainAnimation('gold', 5, 200, 100);
+            }, 500);
+            
+            setTimeout(() => {
+                Assets.createResourceGainAnimation('diamond', 1, 300, 100);
+            }, 1000);
+            
+            // Test ripple effect
+            TestUtils.log("Testing ripple effect");
+            setTimeout(() => {
+                Assets.createRippleEffect(150, 200);
+            }, 1500);
+            
+            setTimeout(() => {
+                Assets.createRippleEffect(250, 200);
+            }, 2000);
+            
+            // Test card animations
+            TestUtils.log("Testing card animations");
+            setTimeout(() => {
+                const cards = document.querySelectorAll('.card');
+                if (cards.length > 0) {
+                    Assets.createCardPurchaseAnimation(cards[0]);
+                    TestUtils.log("Testing card purchase animation");
+                }
+            }, 2500);
+            
+            setTimeout(() => {
+                const cards = document.querySelectorAll('.card');
+                if (cards.length > 1) {
+                    Assets.createCardUseAnimation(cards[1]);
+                    TestUtils.log("Testing card use animation");
+                }
+            }, 3000);
+        });
+        
+        document.getElementById('add-resources').addEventListener('click', function() {
+            TestUtils.addResources();
+        });
+        
+        // Initialize test log
+        window.addEventListener('load', function() {
+            TestUtils.log("Test page loaded");
+            TestUtils.log("Click the test buttons below to test different features");
+        });
+    </script>
+</body>
+</html>

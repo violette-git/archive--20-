@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DigDeep Audio Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .test-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h2 {
+            margin-top: 0;
+            color: #555;
+        }
+        button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .volume-control {
+            margin-bottom: 15px;
+        }
+        .volume-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        input[type="range"] {
+            width: 100%;
+        }
+        #status {
+            background-color: #f9f9f9;
+            border-left: 4px solid #4CAF50;
+            padding: 10px;
+            margin-top: 20px;
+        }
+        .audio-controls {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 8px;
+            padding: 10px;
+            color: white;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+            max-width: 300px;
+        }
+        .audio-controls-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+        .audio-controls-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin: 0;
+        }
+        .audio-controls-toggle {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .audio-controls-content {
+            transition: max-height 0.3s ease, opacity 0.3s ease;
+            max-height: 200px;
+            opacity: 1;
+            overflow: hidden;
+        }
+        .audio-controls.collapsed .audio-controls-content {
+            max-height: 0;
+            opacity: 0;
+        }
+        .volume-control-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .volume-control-name {
+            font-size: 14px;
+        }
+        .volume-control-value {
+            font-size: 12px;
+            color: #ccc;
+        }
+        .volume-slider {
+            width: 100%;
+            height: 6px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: #444;
+            outline: none;
+            border-radius: 3px;
+        }
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #fff;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .volume-slider::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #fff;
+            cursor: pointer;
+            transition: background 0.2s;
+            border: none;
+        }
+        .mute-button {
+            background: none;
+            border: 2px solid #fff;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background-color 0.2s, color 0.2s;
+            margin-top: 10px;
+            width: 100%;
+        }
+        .mute-button.muted {
+            background-color: #ff5555;
+            border-color: #ff5555;
+        }
+    </style>
+</head>
+<body>
+    <h1>DigDeep Audio System Test</h1>
+    
+    <div class="test-section">
+        <h2>Sound Effects</h2>
+        <div class="button-group">
+            <button id="test-dig">Test Dig Sound</button>
+            <button id="test-collect">Test Collect Sound</button>
+            <button id="test-purchase">Test Purchase Sound</button>
+            <button id="test-click">Test Click Sound</button>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Background Music</h2>
+        <div class="button-group">
+            <button id="play-mining">Play Mining Adventure</button>
+            <button id="play-cave">Play Cave Ambience</button>
+            <button id="stop-music">Stop Music</button>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Audio Controls</h2>
+        <p>The audio controls panel should appear in the bottom right corner of the screen.</p>
+        <button id="toggle-controls">Toggle Controls Visibility</button>
+    </div>
+    
+    <div id="status">
+        <p>Status: Ready to test audio system</p>
+    </div>
+
+    <script>
+        // Audio System Implementation
+        const AudioSystem = {
+            // Audio context
+            context: null,
+            
+            // Sound effect buffers
+            soundBuffers: {
+                dig: null,
+                collect: null,
+                purchase: null,
+                click: null
+            },
+            
+            // Music buffers
+            musicBuffers: {
+                miningAdventure: null,
+                caveAmbience: null
+            },
+            
+            // Currently playing music
+            currentMusic: null,
+            
+            // Volume settings
+            volume: {
+                master: 1.0,
+                sfx: 0.8,
+                music: 0.5
+            },
+            
+            // Mute state
+            muted: false,
+            
+            // Initialization state
+            initialized: false,
+            
+            /**
+             * Initialize the audio system
+             * @returns {Promise} Promise that resolves when audio is loaded
+             */
+            init: async function() {
+                if (this.initialized) return Promise.resolve();
+                
+                updateStatus("Initializing audio system...");
+                
+                try {
+                    // Create audio context
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    this.context = new AudioContext();
+                    
+                    // Load sound effects
+                    await this.loadSoundEffects();
+                    
+                    // Load music
+                    await this.loadMusic();
+                    
+                    // Load saved volume settings
+                    this.loadVolumeSettings();
+                    
+                    this.initialized = true;
+                    updateStatus("Audio system initialized successfully!");
+                    
+                    return Promise.resolve();
+                } catch (error) {
+                    updateStatus("Failed to initialize audio system: " + error.message);
+                    console.error("Failed to initialize audio system:", error);
+                    return Promise.reject(error);
+                }
+            },
+            
+            /**
+             * Load all sound effects
+             * @returns {Promise} Promise that resolves when all sound effects are loaded
+             */
+            loadSoundEffects: async function() {
+                const soundFiles = {
+                    dig: 'audio/sfx/dig.wav',
+                    collect: 'audio/sfx/collect.wav',
+                    purchase: 'audio/sfx/purchase.wav',
+                    click: 'audio/sfx/click.wav'
+                };
+                
+                const loadPromises = [];
+                
+                for (const [name, path] of Object.entries(soundFiles)) {
+                    loadPromises.push(
+                        this.loadSound(path)
+                            .then(buffer => {
+                                this.soundBuffers[name] = buffer;
+                                updateStatus(`Loaded sound effect: ${name}`);
+                            })
+                            .catch(error => {
+                                updateStatus(`Failed to load sound effect ${name}: ${error.message}`);
+                                console.error(`Failed to load sound effect ${name}:`, error);
+                            })
+                    );
+                }
+                
+                return Promise.all(loadPromises);
+            },
+            
+            /**
+             * Load all music tracks
+             * @returns {Promise} Promise that resolves when all music is loaded
+             */
+            loadMusic: async function() {
+                const musicFiles = {
+                    miningAdventure: 'audio/music/mining_adventure.wav',
+                    caveAmbience: 'audio/music/cave_ambience.wav'
+                };
+                
+                const loadPromises = [];
+                
+                for (const [name, path] of Object.entries(musicFiles)) {
+                    loadPromises.push(
+                        this.loadSound(path)
+                            .then(buffer => {
+                                this.musicBuffers[name] = buffer;
+                                updateStatus(`Loaded music track: ${name}`);
+                            })
+                            .catch(error => {
+                                updateStatus(`Failed to load music track ${name}: ${error.message}`);
+                                console.error(`Failed to load music track ${name}:`, error);
+                            })
+                    );
+                }
+                
+                return Promise.all(loadPromises);
+            },
+            
+            /**
+             * Load a sound file
+             * @param {string} url - URL of the sound file
+             * @returns {Promise<AudioBuffer>} Promise that resolves with the audio buffer
+             */
+            loadSound: function(url) {
+                return fetch(url)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! Status: ${response.status}`);
+                        }
+                        return response.arrayBuffer();
+                    })
+                    .then(arrayBuffer => this.context.decodeAudioData(arrayBuffer));
+            },
+            
+            /**
+             * Play a sound effect
+             * @param {string} name - Name of the sound effect to play
+             * @param {number} [volume=1.0] - Volume of the sound effect (0.0 to 1.0)
+             */
+            playSound: function(name, volume = 1.0) {
+                if (!this.initialized || this.muted) return;
+                
+                const buffer = this.soundBuffers[name];
+                if (!buffer) {
+                    updateStatus(`Sound effect "${name}" not found`);
+                    return;
+                }
+                
+                // Create source
+                const source = this.context.createBufferSource();
+                source.buffer = buffer;
+                
+                // Create gain node for volume control
+                const gainNode = this.context.createGain();
+                gainNode.gain.value = volume * this.volume.sfx * this.volume.master;
+                
+                // Connect nodes
+                source.connect(gainNode);
+                gainNode.connect(this.context.destination);
+                
+                // Play sound
+                source.start(0);
+                updateStatus(`Playing sound effect: ${name}`);
+            },
+            
+            /**
+             * Play background music
+             * @param {string} name - Name of the music track to play
+             * @param {boolean} [loop=true] - Whether to loop the music
+             */
+            playMusic: function(name, loop = true) {
+                if (!this.initialized) return;
+                
+                // Stop current music if playing
+                this.stopMusic();
+                
+                const buffer = this.musicBuffers[name];
+                if (!buffer) {
+                    updateStatus(`Music track "${name}" not found`);
+                    return;
+                }
+                
+                // Create source
+                const source = this.context.createBufferSource();
+                source.buffer = buffer;
+                source.loop = loop;
+                
+                // Create gain node for volume control
+                const gainNode = this.context.createGain();
+                gainNode.gain.value = this.muted ? 0 : this.volume.music * this.volume.master;
+                
+                // Connect nodes
+                source.connect(gainNode);
+                gainNode.connect(this.context.destination);
+                
+                // Play music
+                source.start(0);
+                
+                // Store reference to current music
+                this.currentMusic = {
+                    source: source,
+                    gainNode: gainNode,
+                    name: name
+                };
+                
+                updateStatus(`Playing music track: ${name}`);
+            },
+            
+            /**
+             * Stop currently playing music
+             */
+            stopMusic: function() {
+                if (this.currentMusic && this.currentMusic.source) {
+                    try {
+                        this.currentMusic.source.stop();
+                        updateStatus(`Stopped music track: ${this.currentMusic.name}`);
+                    } catch (e) {
+                        // Ignore errors if already stopped
+                    }
+                    this.currentMusic = null;
+                }
+            },
+            
+            /**
+             * Set master volume
+             * @param {number} volume - Volume level (0.0 to 1.0)
+             */
+            setMasterVolume: function(volume) {
+                this.volume.master = Math.max(0, Math.min(1, volume));
+                this.updateMusicVolume();
+                this.saveVolumeSettings();
+                updateStatus(`Master volume set to ${Math.round(volume * 100)}%`);
+            },
+            
+            /**
+             * Set sound effects volume
+             * @param {number} volume - Volume level (0.0 to 1.0)
+             */
+            setSfxVolume: function(volume) {
+                this.volume.sfx = Math.max(0, Math.min(1, volume));
+                this.saveVolumeSettings();
+                updateStatus(`Sound effects volume set to ${Math.round(volume * 100)}%`);
+            },
+            
+            /**
+             * Set music volume
+             * @param {number} volume - Volume level (0.0 to 1.0)
+             */
+            setMusicVolume: function(volume) {
+                this.volume.music = Math.max(0, Math.min(1, volume));
+                this.updateMusicVolume();
+                this.saveVolumeSettings();
+                updateStatus(`Music volume set to ${Math.round(volume * 100)}%`);
+            },
+            
+            /**
+             * Update the volume of currently playing music
+             */
+            updateMusicVolume: function() {
+                if (this.currentMusic && this.currentMusic.gainNode) {
+                    this.currentMusic.gainNode.gain.value = this.muted ? 0 : this.volume.music * this.volume.master;
+                }
+            },
+            
+            /**
+             * Toggle mute state
+             * @returns {boolean} New mute state
+             */
+            toggleMute: function() {
+                this.muted = !this.muted;
+                this.updateMusicVolume();
+                this.saveVolumeSettings();
+                updateStatus(`Audio ${this.muted ? 'muted' : 'unmuted'}`);
+                return this.muted;
+            },
+            
+            /**
+             * Set mute state
+             * @param {boolean} muted - Whether audio should be muted
+             */
+            setMute: function(muted) {
+                this.muted = muted;
+                this.updateMusicVolume();
+                this.saveVolumeSettings();
+                updateStatus(`Audio ${this.muted ? 'muted' : 'unmuted'}`);
+            },
+            
+            /**
+             * Save volume settings to local storage
+             */
+            saveVolumeSettings: function() {
+                const settings = {
+                    master: this.volume.master,
+                    sfx: this.volume.sfx,
+                    music: this.volume.music,
+                    muted: this.muted
+                };
+                
+                localStorage.setItem('digdeep_audio_settings', JSON.stringify(settings));
+            },
+            
+            /**
+             * Load volume settings from local storage
+             */
+            loadVolumeSettings: function() {
+                const savedSettings = localStorage.getItem('digdeep_audio_settings');
+                
+                if (savedSettings) {
+                    try {
+                        const settings = JSON.parse(savedSettings);
+                        
+                        this.volume.master = settings.master !== undefined ? settings.master : this.volume.master;
+                        this.volume.sfx = settings.sfx !== undefined ? settings.sfx : this.volume.sfx;
+                        this.volume.music = settings.music !== undefined ? settings.music : this.volume.music;
+                        this.muted = settings.muted !== undefined ? settings.muted : this.muted;
+                        
+                        updateStatus("Loaded audio settings from local storage");
+                    } catch (error) {
+                        updateStatus("Failed to parse saved audio settings: " + error.message);
+                        console.error("Failed to parse saved audio settings:", error);
+                    }
+                }
+            }
+        };
+
+        // Audio Controls Implementation
+        const AudioControls = {
+            // DOM elements
+            elements: {
+                container: null,
+                masterSlider: null,
+                sfxSlider: null,
+                musicSlider: null,
+                muteButton: null,
+                toggleButton: null
+            },
+            
+            /**
+             * Initialize audio controls
+             */
+            init: function() {
+                updateStatus("Initializing audio controls...");
+                
+                // Create audio controls UI
+                this.createAudioControlsUI();
+                
+                // Set up event listeners
+                this.setupEventListeners();
+                
+                // Update UI with current settings
+                this.updateUI();
+                
+                updateStatus("Audio controls initialized successfully!");
+            },
+            
+            /**
+             * Create audio controls UI
+             */
+            createAudioControlsUI: function() {
+                // Create container
+                const container = document.createElement('div');
+                container.className = 'audio-controls';
+                
+                // Create header
+                const header = document.createElement('div');
+                header.className = 'audio-controls-header';
+                
+                const title = document.createElement('h3');
+                title.className = 'audio-controls-title';
+                title.textContent = 'Audio Controls';
+                
+                const toggleButton = document.createElement('button');
+                toggleButton.className = 'audio-controls-toggle';
+                toggleButton.innerHTML = '<span>▼</span>';
+                
+                header.appendChild(title);
+                header.appendChild(toggleButton);
+                
+                // Create content
+                const content = document.createElement('div');
+                content.className = 'audio-controls-content';
+                
+                // Master volume control
+                const masterControl = this.createVolumeControl('Master', 'master');
+                
+                // SFX volume control
+                const sfxControl = this.createVolumeControl('Sound Effects', 'sfx');
+                
+                // Music volume control
+                const musicControl = this.createVolumeControl('Music', 'music');
+                
+                // Mute button
+                const muteButton = document.createElement('button');
+                muteButton.className = 'mute-button';
+                muteButton.textContent = 'Mute All';
+                
+                // Add all elements to content
+                content.appendChild(masterControl);
+                content.appendChild(sfxControl);
+                content.appendChild(musicControl);
+                content.appendChild(muteButton);
+                
+                // Add header and content to container
+                container.appendChild(header);
+                container.appendChild(content);
+                
+                // Add container to document
+                document.body.appendChild(container);
+                
+                // Store references to elements
+                this.elements.container = container;
+                this.elements.masterSlider = masterControl.querySelector('.volume-slider');
+                this.elements.sfxSlider = sfxControl.querySelector('.volume-slider');
+                this.elements.musicSlider = musicControl.querySelector('.volume-slider');
+                this.elements.muteButton = muteButton;
+                this.elements.toggleButton = toggleButton;
+            },
+            
+            /**
+             * Create a volume control element
+             * @param {string} name - Name of the control
+             * @param {string} id - ID for the control
+             * @returns {HTMLElement} The volume control element
+             */
+            createVolumeControl: function(name, id) {
+                const control = document.createElement('div');
+                control.className = 'volume-control';
+                
+                const label = document.createElement('div');
+                label.className = 'volume-control-label';
+                
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'volume-control-name';
+                nameSpan.textContent = name;
+                
+                const valueSpan = document.createElement('span');
+                valueSpan.className = 'volume-control-value';
+                valueSpan.textContent = '100%';
+                valueSpan.id = `${id}-volume-value`;
+                
+                label.appendChild(nameSpan);
+                label.appendChild(valueSpan);
+                
+                const slider = document.createElement('input');
+                slider.type = 'range';
+                slider.min = '0';
+                slider.max = '100';
+                slider.value = '100';
+                slider.className = 'volume-slider';
+                slider.id = `${id}-volume-slider`;
+                
+                control.appendChild(label);
+                control.appendChild(slider);
+                
+                return control;
+            },
+            
+            /**
+             * Set up event listeners for audio controls
+             */
+            setupEventListeners: function() {
+                // Master volume slider
+                this.elements.masterSlider.addEventListener('input', (e) => {
+                    const volume = parseInt(e.target.value) / 100;
+                    AudioSystem.setMasterVolume(volume);
+                    this.updateVolumeDisplay('master', volume);
+                });
+                
+                // SFX volume slider
+                this.elements.sfxSlider.addEventListener('input', (e) => {
+                    const volume = parseInt(e.target.value) / 100;
+                    AudioSystem.setSfxVolume(volume);
+                    this.updateVolumeDisplay('sfx', volume);
+                });
+                
+                // Music volume slider
+                this.elements.musicSlider.addEventListener('input', (e) => {
+                    const volume = parseInt(e.target.value) / 100;
+                    AudioSystem.setMusicVolume(volume);
+                    this.updateVolumeDisplay('music', volume);
+                });
+                
+                // Mute button
+                this.elements.muteButton.addEventListener('click', () => {
+                    const muted = AudioSystem.toggleMute();
+                    this.updateMuteButton(muted);
+                });
+                
+                // Toggle button
+                this.elements.toggleButton.addEventListener('click', () => {
+                    this.toggleControls();
+                });
+                
+                // Header click to toggle
+                this.elements.container.querySelector('.audio-controls-header').addEventListener('click', (e) => {
+                    if (e.target !== this.elements.toggleButton) {
+                        this.toggleControls();
+                    }
+                });
+            },
+            
+            /**
+             * Update the UI with current audio settings
+             */
+            updateUI: function() {
+                // Update volume sliders
+                this.elements.masterSlider.value = AudioSystem.volume.master * 100;
+                this.elements.sfxSlider.value = AudioSystem.volume.sfx * 100;
+                this.elements.musicSlider.value = AudioSystem.volume.music * 100;
+                
+                // Update volume displays
+                this.updateVolumeDisplay('master', AudioSystem.volume.master);
+                this.updateVolumeDisplay('sfx', AudioSystem.volume.sfx);
+                this.updateVolumeDisplay('music', AudioSystem.volume.music);
+                
+                // Update mute button
+                this.updateMuteButton(AudioSystem.muted);
+            },
+            
+            /**
+             * Update volume display text
+             * @param {string} type - Type of volume (master, sfx, music)
+             * @param {number} volume - Volume level (0.0 to 1.0)
+             */
+            updateVolumeDisplay: function(type, volume) {
+                const valueElement = document.getElementById(`${type}-volume-value`);
+                if (valueElement) {
+                    valueElement.textContent = `${Math.round(volume * 100)}%`;
+                }
+            },
+            
+            /**
+             * Update mute button state
+             * @param {boolean} muted - Whether audio is muted
+             */
+            updateMuteButton: function(muted) {
+                if (muted) {
+                    this.elements.muteButton.textContent = 'Unmute';
+                    this.elements.muteButton.classList.add('muted');
+                } else {
+                    this.elements.muteButton.textContent = 'Mute All';
+                    this.elements.muteButton.classList.remove('muted');
+                }
+            },
+            
+            /**
+             * Toggle audio controls visibility
+             */
+            toggleControls: function() {
+                this.elements.container.classList.toggle('collapsed');
+                
+                // Update toggle button icon
+                const isCollapsed = this.elements.container.classList.contains('collapsed');
+                if (isCollapsed) {
+                    this.elements.toggleButton.innerHTML = '<span>▲</span>';
+                } else {
+                    this.elements.toggleButton.innerHTML = '<span>▼</span>';
+                }
+            }
+        };
+
+        // Helper function to update status
+        function updateStatus(message) {
+            const statusElement = document.querySelector('#status p');
+            statusElement.textContent = `Status: ${message}`;
+            console.log(message);
+        }
+
+        // Initialize audio system when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize audio system
+            AudioSystem.init().then(() => {
+                // Initialize audio controls
+                AudioControls.init();
+                
+                // Set up test buttons
+                document.getElementById('test-dig').addEventListener('click', () => {
+                    AudioSystem.playSound('dig');
+                });
+                
+                document.getElementById('test-collect').addEventListener('click', () => {
+                    AudioSystem.playSound('collect');
+                });
+                
+                document.getElementById('test-purchase').addEventListener('click', () => {
+                    AudioSystem.playSound('purchase');
+                });
+                
+                document.getElementById('test-click').addEventListener('click', () => {
+                    AudioSystem.playSound('click');
+                });
+                
+                document.getElementById('play-mining').addEventListener('click', () => {
+                    AudioSystem.playMusic('miningAdventure');
+                });
+                
+                document.getElementById('play-cave').addEventListener('click', () => {
+                    AudioSystem.playMusic('caveAmbience');
+                });
+                
+                document.getElementById('stop-music').addEventListener('click', () => {
+                    AudioSystem.stopMusic();
+                });
+                
+                document.getElementById('toggle-controls').addEventListener('click', () => {
+                    AudioControls.toggleControls();
+                });
+            }).catch(error => {
+                updateStatus(`Failed to initialize audio system: ${error.message}`);
+            });
+        });
+    </script>
+</body>
+</html>

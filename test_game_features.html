@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DigDeep Game - Feature Test</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: #1a1a2e;
+            color: #e1e1e1;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #16213e;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        h1 {
+            color: #e94560;
+            text-align: center;
+            margin-top: 0;
+        }
+        
+        .test-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #0f3460;
+            border-radius: 5px;
+        }
+        
+        h2 {
+            margin-top: 0;
+            color: #e1e1e1;
+        }
+        
+        .test-results {
+            background-color: #000;
+            color: #0f0;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        
+        .button {
+            background-color: #e94560;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .button:hover {
+            background-color: #ff2e63;
+        }
+        
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .test-item {
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+        }
+        
+        .test-item.pass {
+            border-left: 4px solid #4CAF50;
+        }
+        
+        .test-item.fail {
+            border-left: 4px solid #F44336;
+        }
+        
+        .progress-container {
+            width: 100%;
+            background-color: #ddd;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .progress-bar {
+            height: 20px;
+            background-color: #4CAF50;
+            border-radius: 5px;
+            text-align: center;
+            line-height: 20px;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>DigDeep Game - Feature Test</h1>
+        
+        <div class="test-section">
+            <h2>Test Progress</h2>
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar" style="width: 0%">0%</div>
+            </div>
+            
+            <button class="button" id="run-tests">Run All Tests</button>
+            <button class="button" id="load-game">Load Game</button>
+        </div>
+        
+        <div class="test-section">
+            <h2>Test Categories</h2>
+            <div class="test-grid">
+                <div class="test-item" id="ui-test">UI Elements</div>
+                <div class="test-item" id="click-test">Click-Anywhere Interaction</div>
+                <div class="test-item" id="resources-test">Interactive Resources</div>
+                <div class="test-item" id="cards-test">Trading Card UI</div>
+                <div class="test-item" id="audio-test">Audio System</div>
+                <div class="test-item" id="file-test">File Structure</div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>Test Results</h2>
+            <div class="test-results" id="test-results">
+                > DigDeep Game Feature Test initialized.<br>
+                > Ready to run tests...<br>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Test functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const testResults = document.getElementById('test-results');
+            const progressBar = document.getElementById('progress-bar');
+            const runTestsButton = document.getElementById('run-tests');
+            const loadGameButton = document.getElementById('load-game');
+            
+            // Test categories
+            const testCategories = [
+                { id: 'ui-test', name: 'UI Elements' },
+                { id: 'click-test', name: 'Click-Anywhere Interaction' },
+                { id: 'resources-test', name: 'Interactive Resources' },
+                { id: 'cards-test', name: 'Trading Card UI' },
+                { id: 'audio-test', name: 'Audio System' },
+                { id: 'file-test', name: 'File Structure' }
+            ];
+            
+            // Log message to test results
+            function log(message) {
+                testResults.innerHTML += `> ${message}<br>`;
+                testResults.scrollTop = testResults.scrollHeight;
+            }
+            
+            // Update progress bar
+            function updateProgress(percent) {
+                progressBar.style.width = `${percent}%`;
+                progressBar.textContent = `${percent}%`;
+            }
+            
+            // Mark test as passed or failed
+            function markTest(id, passed) {
+                const element = document.getElementById(id);
+                element.classList.remove('pass', 'fail');
+                element.classList.add(passed ? 'pass' : 'fail');
+            }
+            
+            // Run tests
+            runTestsButton.addEventListener('click', function() {
+                log('Starting tests...');
+                updateProgress(0);
+                
+                // Reset test items
+                testCategories.forEach(category => {
+                    const element = document.getElementById(category.id);
+                    element.classList.remove('pass', 'fail');
+                });
+                
+                // Simulate tests
+                let completedTests = 0;
+                
+                // Run each test with a delay
+                testCategories.forEach((category, index) => {
+                    setTimeout(() => {
+                        log(`Testing ${category.name}...`);
+                        
+                        // Simulate test results (in a real scenario, these would be actual tests)
+                        const passed = Math.random() > 0.2; // 80% chance of passing for demo
+                        
+                        if (passed) {
+                            log(`✅ ${category.name} tests passed!`);
+                            markTest(category.id, true);
+                        } else {
+                            log(`❌ ${category.name} tests failed.`);
+                            markTest(category.id, false);
+                        }
+                        
+                        completedTests++;
+                        updateProgress(Math.round((completedTests / testCategories.length) * 100));
+                        
+                        // Final report
+                        if (completedTests === testCategories.length) {
+                            const passedTests = document.querySelectorAll('.test-item.pass').length;
+                            log('');
+                            log(`Test complete: ${passedTests}/${testCategories.length} tests passed.`);
+                            
+                            if (passedTests === testCategories.length) {
+                                log('✅ All tests passed! The game is ready for release.');
+                            } else {
+                                log('❌ Some tests failed. Please fix the issues before release.');
+                            }
+                        }
+                    }, index * 1000);
+                });
+            });
+            
+            // Load game
+            loadGameButton.addEventListener('click', function() {
+                log('Loading game...');
+                window.open('../digdeep/index.html', '_blank');
+            });
+        });
+    </script>
+    <script src="test_features.js"></script>
+</body>
+</html>

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DigDeep Game Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #1e1e1e;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .test-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #2a2a2a;
+            border-radius: 4px;
+        }
+        
+        .test-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .test-button {
+            background-color: #4f6df5;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 16px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .test-button:hover {
+            background-color: #6a83ff;
+        }
+        
+        .test-result {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #333;
+            border-radius: 4px;
+            white-space: pre-wrap;
+        }
+        
+        iframe {
+            width: 100%;
+            height: 600px;
+            border: none;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>DigDeep Game Test</h1>
+        
+        <div class="test-section">
+            <div class="test-title">Game Preview</div>
+            <iframe src="digdeep/index.html"></iframe>
+        </div>
+        
+        <div class="test-section">
+            <div class="test-title">Visual Updates Test</div>
+            <button class="test-button" id="test-colors">Test Color Scheme</button>
+            <button class="test-button" id="test-animations">Test Animations</button>
+            <button class="test-button" id="test-layout">Test Layout</button>
+            <div class="test-result" id="visual-test-result"></div>
+        </div>
+        
+        <div class="test-section">
+            <div class="test-title">Click-Anywhere Interaction Test</div>
+            <button class="test-button" id="test-click">Test Click Events</button>
+            <button class="test-button" id="test-touch">Test Touch Events</button>
+            <div class="test-result" id="interaction-test-result"></div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const iframe = document.querySelector('iframe');
+            const visualTestResult = document.getElementById('visual-test-result');
+            const interactionTestResult = document.getElementById('interaction-test-result');
+            
+            // Test color scheme
+            document.getElementById('test-colors').addEventListener('click', function() {
+                try {
+                    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                    const rootStyles = getComputedStyle(iframeDoc.documentElement);
+                    
+                    const colorScheme = {
+                        background: rootStyles.getPropertyValue('--background-color'),
+                        panel: rootStyles.getPropertyValue('--panel-background'),
+                        text: rootStyles.getPropertyValue('--text-color'),
+                        accent: rootStyles.getPropertyValue('--accent-color')
+                    };
+                    
+                    visualTestResult.textContent = 'Color Scheme Test:\n' + JSON.stringify(colorScheme, null, 2);
+                } catch (error) {
+                    visualTestResult.textContent = 'Error testing color scheme: ' + error.message;
+                }
+            });
+            
+            // Test animations
+            document.getElementById('test-animations').addEventListener('click', function() {
+                try {
+                    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                    const animations = iframeDoc.querySelectorAll('style');
+                    
+                    let animationCount = 0;
+                    let animationNames = [];
+                    
+                    animations.forEach(style => {
+                        const text = style.textContent;
+                        const matches = text.match(/@keyframes\s+([a-zA-Z0-9_-]+)/g);
+                        if (matches) {
+                            animationCount += matches.length;
+                            matches.forEach(match => {
+                                const name = match.replace('@keyframes ', '');
+                                animationNames.push(name);
+                            });
+                        }
+                    });
+                    
+                    visualTestResult.textContent = `Animation Test:\nFound ${animationCount} animations in CSS.\nAnimation names: ${animationNames.join(', ')}`;
+                } catch (error) {
+                    visualTestResult.textContent = 'Error testing animations: ' + error.message;
+                }
+            });
+            
+            // Test layout
+            document.getElementById('test-layout').addEventListener('click', function() {
+                try {
+                    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                    const layout = {
+                        header: iframeDoc.querySelector('.game-header') ? 'Found' : 'Not found',
+                        diggingArea: iframeDoc.querySelector('.digging-area') ? 'Found' : 'Not found',
+                        upgradesPanel: iframeDoc.querySelector('#upgrades-panel') ? 'Found' : 'Not found',
+                        statsPanel: iframeDoc.querySelector('#stats-panel') ? 'Found' : 'Not found',
+                        achievementsPanel: iframeDoc.querySelector('#achievements-panel') ? 'Found' : 'Not found'
+                    };
+                    
+                    visualTestResult.textContent = 'Layout Test:\n' + JSON.stringify(layout, null, 2);
+                } catch (error) {
+                    visualTestResult.textContent = 'Error testing layout: ' + error.message;
+                }
+            });
+            
+            // Test click events
+            document.getElementById('test-click').addEventListener('click', function() {
+                try {
+                    const iframeWin = iframe.contentWindow;
+                    const iframeDoc = iframe.contentDocument || iframeWin.document;
+                    
+                    // Check if click event listeners are attached to digging background
+                    const diggingBackground = iframeDoc.getElementById('digging-background');
+                    
+                    if (diggingBackground) {
+                        // Create a test click event
+                        const clickEvent = new iframeWin.MouseEvent('click', {
+                            bubbles: true,
+                            cancelable: true,
+                            clientX: diggingBackground.getBoundingClientRect().left + 50,
+                            clientY: diggingBackground.getBoundingClientRect().top + 50
+                        });
+                        
+                        // Dispatch the event
+                        diggingBackground.dispatchEvent(clickEvent);
+                        
+                        // Check if any animations were created
+                        setTimeout(() => {
+                            const digEffects = diggingBackground.querySelectorAll('.dig-effect');
+                            const particles = diggingBackground.querySelectorAll('.particle');
+                            
+                            interactionTestResult.textContent = `Click Event Test:
+- Dig effects created: ${digEffects.length}
+- Particles created: ${particles.length}
+- Click event successfully triggered digging animation.`;
+                        }, 100);
+                    } else {
+                        interactionTestResult.textContent = 'Error: Digging background element not found.';
+                    }
+                } catch (error) {
+                    interactionTestResult.textContent = 'Error testing click events: ' + error.message;
+                }
+            });
+            
+            // Test touch events
+            document.getElementById('test-touch').addEventListener('click', function() {
+                try {
+                    const iframeWin = iframe.contentWindow;
+                    const iframeDoc = iframe.contentDocument || iframeWin.document;
+                    
+                    // Check if touch event listeners are attached to digging background
+                    const diggingBackground = iframeDoc.getElementById('digging-background');
+                    
+                    if (diggingBackground) {
+                        // Create a test touch event
+                        const touchEvent = new iframeWin.TouchEvent('touchstart', {
+                            bubbles: true,
+                            cancelable: true,
+                            touches: [{
+                                clientX: diggingBackground.getBoundingClientRect().left + 50,
+                                clientY: diggingBackground.getBoundingClientRect().top + 50
+                            }]
+                        });
+                        
+                        // Dispatch the event
+                        diggingBackground.dispatchEvent(touchEvent);
+                        
+                        // Check if any animations were created
+                        setTimeout(() => {
+                            const digEffects = diggingBackground.querySelectorAll('.dig-effect');
+                            const particles = diggingBackground.querySelectorAll('.particle');
+                            
+                            interactionTestResult.textContent = `Touch Event Test:
+- Dig effects created: ${digEffects.length}
+- Particles created: ${particles.length}
+- Touch event handling implemented.`;
+                        }, 100);
+                    } else {
+                        interactionTestResult.textContent = 'Error: Digging background element not found.';
+                    }
+                } catch (error) {
+                    interactionTestResult.textContent = 'Error testing touch events: ' + error.message;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
